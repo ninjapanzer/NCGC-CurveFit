@@ -53,7 +53,7 @@ import edu.scripps.fl.curves.FitFunction;
 public class CurvePlot {
 
 	public static YIntervalSeries sampleFunction2DToSeries(Curve curve, FitFunction f, double start, double end, int samples,
-			Comparable seriesKey) {
+			Comparable<?> seriesKey) {
 		if (f == null)
 			throw new IllegalArgumentException("Null 'f' argument.");
 		if (seriesKey == null)
@@ -102,7 +102,7 @@ public class CurvePlot {
 			renderer.setSeriesShape(idx, ShapeUtilities.createDiagonalCross(size, size));
 		}
 		if (curve.getHillSlope() != null) {
-			YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, 10000, (Comparable) (dataset
+			YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, 10000, (Comparable<?>) (dataset
 					.getSeriesCount() + 1));
 			addSeries(functionSeries, paint, false);
 		}

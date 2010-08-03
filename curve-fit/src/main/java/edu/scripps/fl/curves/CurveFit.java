@@ -115,7 +115,7 @@ public class CurveFit {
 			flags = new boolean[x.length];
 		}
 		// masks
-		List<Boolean> masks = new ArrayList(flags.length);
+		List<Boolean> masks = new ArrayList<Boolean>(flags.length);
 		CollectionUtils.addAll(masks, (Boolean[]) ConvertUtils.convert(flags, Boolean[].class));
 		curve.setMask(masks);
 		// classify

@@ -27,8 +27,6 @@ import java.util.List;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.plot.DrawingSupplier;
 
-import edu.scripps.fl.commons.color.ColorUtils;
-
 /**
  * 
  * @author Mark Southern (southern at scripps dot edu)
@@ -101,9 +99,16 @@ public class CurvePlotDrawingSupplier implements DrawingSupplier {
 		Paint result = this.paintSequence[this.paintIndex % this.paintSequence.length];
 		this.paintIndex++;
 		if( isGrayScale() )
-			result = ColorUtils.toGreyScale((Color) result);
+			result = toGreyScale((Color) result);
 		return result;
 
+	}
+	
+	private static Color toGreyScale(Color c) {
+		int rgb = (int) (((double) c.getRed() * 0.299) + ((double) c.getGreen() * 0.587) + ((double) c.getBlue() * 0.114));
+		if (rgb > 255)
+			rgb = 255;
+		return new Color(rgb, rgb, rgb);
 	}
 
 	@Override
