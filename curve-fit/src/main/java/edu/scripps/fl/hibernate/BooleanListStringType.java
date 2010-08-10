@@ -14,14 +14,12 @@ public class BooleanListStringType extends ListStringType<Boolean> {
 		List<Boolean> ids = newList(list.length());
 		for (int ii = 0; ii < list.length(); ii++) {
 			Boolean bool = null;
-			switch ( list.charAt(ii) ) {
-				case 0: 
-					bool = Boolean.FALSE; break;
-				case 1:
-					bool = Boolean.TRUE; break;
-				default:
-					bool = null;
-			}
+			if( '0' == list.charAt(ii) )
+				bool = Boolean.FALSE;
+			else if( '1' == list.charAt(ii) )
+				bool = Boolean.TRUE;
+			else
+				bool = null;
 			ids.set(ii, bool);
 		}
 		return ids;
