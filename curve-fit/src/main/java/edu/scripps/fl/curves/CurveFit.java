@@ -78,6 +78,7 @@ public class CurveFit {
 			curve.setR2(fitValues[3]);
 
 			double ec50 = 1000000D * Math.exp(Math.log(10D) * curve.getLogEC50());
+			double testEC50 = Math.pow(10, curve.getLogEC50());
 			Double ic50 = null;
 			double logIC50 = BatchHill.iccalc(curve.getYZero(), curve.getYInflection(), curve.getLogEC50(), curve.getHillSlope(), 50D);
 			if (logIC50 < 0.0D)

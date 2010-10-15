@@ -18,6 +18,7 @@ package edu.scripps.fl.curves.plot;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Paint;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -281,5 +282,9 @@ public class CurvePlot {
 		ChartUtilities.writeChartAsPNG(os, chart, getWidth(), getHeight());
 		os.close();
 		return os.toByteArray();
+	}
+	
+	public Image writeImage() {
+		return chart.createBufferedImage(getWidth(), getHeight());
 	}
 }

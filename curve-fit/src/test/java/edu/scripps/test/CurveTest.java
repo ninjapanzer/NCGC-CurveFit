@@ -110,9 +110,10 @@ public class CurveTest {
 	public static void testJFreeChartPlots() throws Exception {
 		CurvePlot plot = new CurvePlot();
 		CurvePlotDrawingSupplier d = (CurvePlotDrawingSupplier) plot.getDrawingSupplier();
-		d.setLineWidth(1);
-		d.setShapeSize(2);
-		plot.setResponseRange(-120, 20);
+		d.setLineWidth(4);
+		d.setShapeSize(14);
+		plot.setFontSize(28);
+		plot.setResponseRange(-105, 5);
 		for (Curve curve : new Curve[] { fullCurveDecrease(), partialCurveDecrease() } ) {
 //		for (Curve curve : new Curve[] { inactiveCurve(), fullCurveDecrease(), partialCurveDecrease(), fullCurveIncrease() }) {
 			CurveFit.fit(curve);

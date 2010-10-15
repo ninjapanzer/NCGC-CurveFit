@@ -41,12 +41,13 @@ import edu.scripps.fl.hibernate.DoubleListStringType;
 @Entity
 @Table(name = "curves")
 @TypeDefs( { @TypeDef(name = "DoubleListStringType", typeClass = DoubleListStringType.class),
-		     @TypeDef(name = "BooleanListStringType", typeClass = BooleanListStringType.class) })
+		     @TypeDef(name = "BooleanListStringType",typeClass = BooleanListStringType.class) })
 public class Curve {
-	
+
+	private String name = "";
 	private List<Double> concentrations = new ArrayList<Double>();
 	private Double curveClass;
-	private String curveDescription;
+	private String curveDescription = "";
 	private Double EC50;
 	private Double hillSlope;
 	private Double IC50;
@@ -62,7 +63,17 @@ public class Curve {
 	private Double responseMin;
 	private Double responseRange;
 	private List<Double> responses = new ArrayList<Double>();
-	private String signalDirection;
+	private String signalDirection = "";
+
+	@Column(name = "name")
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	private Double SYX;
 	private Double YInflection;
 	private Double YZero;
@@ -90,7 +101,7 @@ public class Curve {
 	}
 
 	@Type(type = "DoubleListStringType")
-	@Fetch(value = FetchMode.SUBSELECT)
+	@Fetch(value = FetchMode.SELECT)
 	@Column(name = "concentrations", length = 4000)
 	public List<Double> getConcentrations() {
 		return concentrations;
@@ -134,7 +145,7 @@ public class Curve {
 	}
 
 	@Type(type = "BooleanListStringType")
-	@Fetch(value = FetchMode.SUBSELECT)
+	@Fetch(value = FetchMode.SELECT)
 	@Column(name = "mask", length = 4000)
 	public List<Boolean> getMask() {
 		return mask;
@@ -181,7 +192,7 @@ public class Curve {
 	}
 
 	@Type(type = "DoubleListStringType")
-	@Fetch(value = FetchMode.SUBSELECT)
+	@Fetch(value = FetchMode.SELECT)
 	@Column(name = "responses", length = 4000)
 	public List<Double> getResponses() {
 		return responses;

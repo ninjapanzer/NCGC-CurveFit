@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.scripps</groupId>
 	<artifactId>curvefit</artifactId>
-	<version>20100720</version>
+	<version>20101015</version>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<pluginManagement>
@@ -67,6 +67,8 @@
 			<groupId>com.google.code</groupId>
 			<artifactId>charts4j</artifactId>
 			<version>1.2</version>
+			<scope>system</scope>
+			<systemPath>${project.build.directory}/../lib/charts4j-1.2.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -81,7 +83,7 @@
 		<dependency> <!-- required by hibernate -->
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.9.0.GA</version>
+			<version>3.8.0.GA</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
