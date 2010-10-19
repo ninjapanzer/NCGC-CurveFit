@@ -5,7 +5,6 @@
 	<artifactId>curvefit</artifactId>
 	<version>20101015</version>
 	<build>
-		<finalName>${project.artifactId}</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -20,14 +19,8 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>java.net-maven2-repository</id>
-			<url>http://download.java.net/maven/2/
-			</url>
-		</repository>
-		<repository>
 			<id>local</id>
-			<url>file:${basedir}/src/repository
-			</url>
+			<url>file:${basedir}/src/repository</url>
 		</repository>
 	</repositories>
 	<dependencies>
