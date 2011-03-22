@@ -22,9 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 
-import edu.scripps.fl.curves.AEModel67Function;
 import edu.scripps.fl.curves.Curve;
 import edu.scripps.fl.curves.CurveFit;
 import edu.scripps.fl.curves.NCGCFitFunction;
@@ -78,6 +76,7 @@ public class CurveTest {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		CurveFit.fit(inactiveCurve());
 		testJFreeChartPlots();
 		testGooglePlots();
 	}
@@ -118,7 +117,7 @@ public class CurveTest {
 //		for (Curve curve : new Curve[] { inactiveCurve(), fullCurveDecrease(), partialCurveDecrease(), fullCurveIncrease() }) {
 			CurveFit.fit(curve);
 			System.out.println(curve);
-			plot.addCurveMeanAndStdDev(curve, new NCGCFitFunction());
+			plot.addCurveMeanAndStdDev(curve, new NCGCFitFunction(), "");
 		}
 		plot.addLineAt(-50);
 		File file = File.createTempFile("curveplot", ".png");

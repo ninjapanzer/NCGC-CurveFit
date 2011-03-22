@@ -79,8 +79,13 @@ public class Curve {
 	private Double YZero;
 
 	public void add(Double response, Double concentration) {
+		add(response, concentration, true);
+	}
+	
+	public void add(Double response, Double concentration, Boolean mask) {
 		responses.add(response);
 		concentrations.add(concentration);
+		getMask().add(mask);
 	}
 
 	@Override

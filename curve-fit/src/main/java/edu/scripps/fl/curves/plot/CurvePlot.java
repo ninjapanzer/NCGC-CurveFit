@@ -42,6 +42,8 @@ import org.jfree.data.Range;
 import org.jfree.data.xy.YIntervalSeries;
 import org.jfree.data.xy.YIntervalSeriesCollection;
 import org.jfree.util.ShapeUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.scripps.fl.curves.Curve;
 import edu.scripps.fl.curves.FitFunction;
@@ -52,9 +54,12 @@ import edu.scripps.fl.curves.FitFunction;
  * 
  */
 public class CurvePlot {
+	
+	private static final Logger log = LoggerFactory.getLogger(CurvePlot.class);
 
 	public static YIntervalSeries sampleFunction2DToSeries(Curve curve, FitFunction f, double start, double end, int samples,
 			Comparable<?> seriesKey) {
+		log.debug("Creating function series");
 		if (f == null)
 			throw new IllegalArgumentException("Null 'f' argument.");
 		if (seriesKey == null)
@@ -64,12 +69,14 @@ public class CurvePlot {
 		if (samples < 2)
 			throw new IllegalArgumentException("Requires 'samples' > 1");
 		YIntervalSeries series = new YIntervalSeries(seriesKey);
+		series.setMaximumItemCount(samples);
 		double step = (end - start) / (double) (samples - 1);
 		for (int i = 0; i < samples; i++) {
 			double x = start + step * (double) i;
 			double value = f.getResponse(curve, x);
 			series.add(x, value, value, value);
 		}
+		log.debug("Created function series");
 		return series;
 	}
 
@@ -82,8 +89,9 @@ public class CurvePlot {
 	private final NumberFormat nf = new DecimalFormat("0.##E0");
 	private XYPlot plot;
 	private int width = 500, height = 400;
-	private String xAxisLabel = "";
-	private String yAxisLabel = "";
+	private String xAxisLabel = "Concentration";
+	private String yAxisLabel = "Response";
+
 	public CurvePlot() {
 		init();
 	}
@@ -92,9 +100,9 @@ public class CurvePlot {
 			double max) {
 		MyXYErrorRenderer renderer = (MyXYErrorRenderer) plot.getRenderer();
 		Paint paint = plot.getDrawingSupplier().getNextPaint();
-		addSeries(validSeries, paint, true);
+		addSeries(validSeries, paint, true, true);
 		if ( isDisplayInvalidPoints() && invalidSeries.getItemCount() > 0) {
-			int idx = addSeries(invalidSeries, paint, true);
+			int idx = addSeries(invalidSeries, paint, true, false);
 			float size = (float) DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE[0].getBounds().getWidth();
 			DrawingSupplier ds = this.getDrawingSupplier();
 			if( ds instanceof CurvePlotDrawingSupplier )
@@ -102,16 +110,24 @@ public class CurvePlot {
 			size = (float) Math.floor((size - 1) / 2);
 			renderer.setSeriesShape(idx, ShapeUtilities.createDiagonalCross(size, size));
 		}
-		if (curve.getHillSlope() != null) {
-			YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, 10000, (Comparable<?>) (dataset
+		try {
+			YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, getWidth(), (Comparable<?>) (dataset
 					.getSeriesCount() + 1));
-			addSeries(functionSeries, paint, false);
+			addSeries(functionSeries, paint, false, false);
+		}
+		catch(NullPointerException ex) {
+			ex.printStackTrace();
 		}
 	}
-
+	
 	public void addCurveAllPoints(Curve curve, FitFunction fitFunction) {
+		addCurveAllPoints(curve, fitFunction, "");
+	}
+
+	public void addCurveAllPoints(Curve curve, FitFunction fitFunction, String description) {
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
-		YIntervalSeries validSeries = new YIntervalSeries("");
+		YIntervalSeries validSeries = new YIntervalSeries(description);
+		validSeries.setDescription(description);
 		YIntervalSeries invalidSeries = new YIntervalSeries("");
 		for (int ii = 0; ii < curve.getConcentrations().size(); ii++) {
 			Double c = curve.getConcentrations().get(ii);
@@ -126,7 +142,7 @@ public class CurvePlot {
 		addCurve(curve, validSeries, invalidSeries, fitFunction, min, max);
 	}
 
-	public void addCurveMeanAndStdDev(Curve curve, FitFunction fitFunction) {
+	public void addCurveMeanAndStdDev(Curve curve, FitFunction fitFunction, String description) {
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
 		MultiValueMap validMap = new MultiValueMap();
 		MultiValueMap invalidMap = new MultiValueMap();
@@ -141,7 +157,7 @@ public class CurvePlot {
 			min = Math.min(min, c);
 			max = Math.max(max, c);
 		}
-		addCurve(curve, getSeries(validMap), getSeries(invalidMap), fitFunction, min, max);
+		addCurve(curve, getSeries(validMap, description), getSeries(invalidMap, ""), fitFunction, min, max);
 	}
 
 	public void addLineAt(double response) {
@@ -156,13 +172,13 @@ public class CurvePlot {
 		YIntervalSeries series = new YIntervalSeries("");
 		series.add(lower, response, response, response);
 		series.add(upper, response, response, response);
-		addSeries(series, paint, false);
+		addSeries(series, paint, false, false);
 		MyXYErrorRenderer renderer = (MyXYErrorRenderer) plot.getRenderer();
 		int idx = dataset.getSeriesCount() - 1;
 		renderer.setSeriesStroke(idx, stroke);
 	}
 
-	protected int addSeries(YIntervalSeries series, Paint paint, boolean showShapes) {
+	protected int addSeries(YIntervalSeries series, Paint paint, boolean showShapes, boolean showInLegend) {
 		MyXYErrorRenderer renderer = (MyXYErrorRenderer) plot.getRenderer();
 		int idx;
 		dataset.addSeries(series);
@@ -172,6 +188,7 @@ public class CurvePlot {
 		renderer.setSeriesYError(idx, showShapes);
 		renderer.setSeriesXError(idx, false);
 		renderer.setSeriesPaint(idx, paint);
+		renderer.setSeriesVisibleInLegend(idx, showInLegend);
 		return idx;
 	}
 
@@ -183,8 +200,9 @@ public class CurvePlot {
 		return height;
 	}
 
-	protected YIntervalSeries getSeries(Map<Double, Collection<Double>> map) {
-		YIntervalSeries series = new YIntervalSeries("");
+	protected YIntervalSeries getSeries(Map<Double, Collection<Double>> map, String description) {
+		YIntervalSeries series = new YIntervalSeries(description);
+		series.setDescription(description);
 		for (Object o : map.keySet()) {
 			SummaryStatistics stats = new SummaryStatistics();
 			Collection<Double> values = (Collection<Double>) map.get(o);
@@ -209,12 +227,15 @@ public class CurvePlot {
 			public NumberFormat getNumberFormatOverride() {
 				return nf;
 			}
+			protected String createTickLabel(double value) {
+	            return getNumberFormatOverride().format(value * 1E-6);
+			}
 		};
 		xAxis.setTickUnit(new NumberTickUnit(1.0, nf));
 		xAxis.setTickMarksVisible(true);
 		// xAxis.setTickLabelFont(font); // now set in separate method
 		NumberAxis yAxis = new NumberAxis(yAxisLabel);
-		yAxis.setRange(-20, 120);
+//		yAxis.setRange(-20, 120);
 		// yAxis.setTickLabelFont(font);
 		yAxis.setTickUnit(new NumberTickUnit(25));
 		plot = new XYPlot(dataset, xAxis, yAxis, null);
@@ -225,7 +246,7 @@ public class CurvePlot {
 		MyXYErrorRenderer renderer = new MyXYErrorRenderer();
 		plot.setRenderer(renderer);
 		plot.setBackgroundPaint(Color.WHITE);
-		chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+		chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 		chart.setBackgroundPaint(Color.WHITE);
 		plot.setDrawingSupplier(new CurvePlotDrawingSupplier());
 	}

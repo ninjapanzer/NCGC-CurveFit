@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gov.nih.ncgc.batch.BatchHill;
 import gov.nih.ncgc.batch.CurveClass;
@@ -35,6 +37,13 @@ import gov.nih.ncgc.batch.HillStat;
  * @author Mark Southern (southern at scripps dot edu)
  */
 public class CurveFit {
+	
+	private static final Logger log = LoggerFactory.getLogger(CurveFit.class);
+	
+	static {
+		HillFit.setFastFlag(true);		
+	}
+	
 	public static double[] expand(double x[]) {
 		double x2[] = new double[2 * x.length - 1];
 		for (int i = 0; i < x2.length; i++)
@@ -46,6 +55,7 @@ public class CurveFit {
 	}
 
 	public static void fit(Curve curve) {
+		log.debug("Fitting Curve: " + curve);
 		double y[] = (double[]) ConvertUtils.convert(curve.getResponses(), double[].class);
 		double x[] = (double[]) ConvertUtils.convert(curve.getConcentrations(), double[].class);
 		for (int ii = 0; ii < x.length; ii++)
@@ -71,6 +81,8 @@ public class CurveFit {
 			flags = (boolean[]) fitResults[0];
 			fitValues = (double[]) fitResults[1];
 			maps = (Map[]) fitResults[2];
+		}
+		if (fitValues != null) {
 			curve.setYZero(fitValues[6]);
 			curve.setLogEC50(fitValues[0]);
 			curve.setYInflection(fitValues[1]);
@@ -122,7 +134,7 @@ public class CurveFit {
 		// classify
 		curveClassification(curve, y, x, flags);
 		// rank
-		double rank = -BatchHill.calcRank(curve.getCurveClass(), curve.getMaxResponse(), curve.getResponseRange(), fitValues);
+		double rank = -BatchHill.calcRank(curve.getCurveClass(), curve.getMaxResponse(), curve.getResponseRange());
 		curve.setRank(rank);
 	}
 
