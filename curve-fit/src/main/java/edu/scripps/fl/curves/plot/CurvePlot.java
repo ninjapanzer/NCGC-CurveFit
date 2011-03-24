@@ -110,14 +110,15 @@ public class CurvePlot {
 			size = (float) Math.floor((size - 1) / 2);
 			renderer.setSeriesShape(idx, ShapeUtilities.createDiagonalCross(size, size));
 		}
-		try {
-			YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, getWidth(), (Comparable<?>) (dataset
-					.getSeriesCount() + 1));
-			addSeries(functionSeries, paint, false, false);
-		}
-		catch(NullPointerException ex) {
-			ex.printStackTrace();
-		}
+		if( null != fitFunction )
+			try {
+				YIntervalSeries functionSeries = sampleFunction2DToSeries(curve, fitFunction, min, max, getWidth(), (Comparable<?>) (dataset
+						.getSeriesCount() + 1));
+				addSeries(functionSeries, paint, false, false);
+			}
+			catch(NullPointerException ex) {
+				ex.printStackTrace();
+			}
 	}
 	
 	public void addCurveAllPoints(Curve curve, FitFunction fitFunction) {
@@ -228,7 +229,7 @@ public class CurvePlot {
 				return nf;
 			}
 			protected String createTickLabel(double value) {
-	            return getNumberFormatOverride().format(value * 1E-6);
+	            return getNumberFormatOverride().format(value);
 			}
 		};
 		xAxis.setTickUnit(new NumberTickUnit(1.0, nf));
